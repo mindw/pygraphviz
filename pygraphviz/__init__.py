@@ -29,26 +29,8 @@ from __future__ import print_function
 from __future__ import division
 
 # Release data
+from ._version import version as __version__
 from . import release
-
-if release.revision is None:
-    # we probably not running in an svn directory   
-    try:
-        # use release data stored at installatation time.
-        from . import version
-        __version__ = version.__version__
-        __revision__ = version.__revision__
-        __date__ = version.__date__
-    except ImportError:
-        # version.py was not created or no longer exists
-        __version__ = release.version
-        __revision__ = release.revision
-        __date__ = release.date
-else:
-    # use dynamic values, even if version.py exists
-    __version__ = release.version
-    __revision__ = release.revision
-    __date__ = release.date
 
 __author__   = '%s <%s>\n%s <%s>\n%s <%s>' % \
               ( release.authors['Hagberg'] + release.authors['Schult'] + \
@@ -67,4 +49,4 @@ __all__=[
     ]
 
 
-from pygraphviz.tests.test import run as test
+from .tests.test import run as test

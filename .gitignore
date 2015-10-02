@@ -30,3 +30,5 @@ pygraphviz/_graphviz*.so
 .tox/
 MANIFEST
 .eggs/
+
+pygraphviz/_version.py

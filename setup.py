@@ -10,33 +10,17 @@ from __future__ import division
 from glob import glob
 
 import os
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 import sys
 
 from setup_commands import AddExtensionDevelopCommand, AddExtensionInstallCommand
-from setup_extra import get_graphviz_dirs
 
-
-if os.path.exists('MANIFEST'): os.remove('MANIFEST')
-
-if sys.argv[-1] == 'setup.py':
-    print("To install, run 'python setup.py install'")
-    print()
-
-if sys.version_info[:2] < (2, 6):
+if sys.version_info < (2, 6):
     print("PyGraphviz requires Python version 2.6 or later (%d.%d detected)." %
           sys.version_info[:2])
     sys.exit(-1)
 
-# Write the version information.
-#TODO rework this import hack with import graphviz.release or import graphviz.version ( doesn't work now because of code in the __init__)
-sys.path.insert(0, 'pygraphviz')
-import release
-release.write_versionfile()
-sys.path.pop(0)
-
-packages = ["pygraphviz", "pygraphviz.tests"]
-docdirbase = 'share/doc/pygraphviz-%s' % release.version
+docdirbase = 'share/doc/pygraphviz'
 data = [
     (docdirbase, glob("*.txt")),
     (os.path.join(docdirbase, 'examples'), glob("examples/*.py")),
@@ -45,10 +29,13 @@ data = [
 ]
 package_data = {'': ['*.txt'], }
 
+with open('pygraphviz/release.py') as fp:
+    exec(fp.read(), None)
+
 if __name__ == "__main__":
     define_macros = []
     if sys.platform == "win32":
-        define_macros = define_macros.append(('GVDLL', None))
+        define_macros.append(('WIN32', None))
 
     extension = [
         Extension(
@@ -68,19 +55,28 @@ if __name__ == "__main__":
     ]
 
     setup(
-        name=release.name,
-        version=release.version,
-        author=release.authors['Hagberg'][0],
-        author_email=release.authors['Hagberg'][1],
-        description=release.description,
-        keywords=release.keywords,
-        long_description=release.long_description,
-        license=release.license,
-        platforms=release.platforms,
-        url=release.url,
-        download_url=release.download_url,
-        classifiers=release.classifiers,
-        packages=packages,
+        name=name,
+        use_scm_version={
+            'version_scheme': 'guess-next-dev',
+            'local_scheme': 'dirty-tag',
+            'write_to': 'pygraphviz/_version.py'
+        },
+
+        setup_requires=[
+            'setuptools>=18.0',
+            'setuptools-scm>1.5.4'
+        ],
+        author=authors['Hagberg'][0],
+        author_email=authors['Hagberg'][1],
+        description=description,
+        keywords=keywords,
+        long_description=long_description,
+        license=license,
+        platforms=platforms,
+        url=url,
+        download_url=download_url,
+        classifiers=classifiers,
+        packages=find_packages(),
         data_files=data,
         ext_modules=extension,
         cmdclass={
